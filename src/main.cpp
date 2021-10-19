@@ -1,18 +1,21 @@
 #include <iostream>
 
+#include "vec3.h"
+#include "color.h"
+
 int main() {
     // Image dimensions
     auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400;
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
+    const int IMAGE_WIDTH = 400;
+    const int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / aspect_ratio);
 
     // PPM image headers
     std::cout << "P3" << '\n'
-        << image_width << ' ' << image_height << '\n'
+        << IMAGE_WIDTH << ' ' << IMAGE_HEIGHT << '\n'
         << 255 << '\n';
     
     // Iterate over height and width
-    for (int j = image_height-1; j >= 0; j--) {
+    for (int j = IMAGE_HEIGHT-1; j >= 0; j--) {
         /**
          * We are outputting it as error because error output does not
          * get redirected to the file by default we use std::flush,
@@ -24,14 +27,17 @@ int main() {
          **/
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
 
-        for (int i = 0; i < image_width; i++) {
+        for (int i = 0; i < IMAGE_WIDTH; i++) {
             // Colors are usually represented by color values from 0.0 to 1.0
     
-            // Make r go from 0.0 to 1.0
-            auto r = double(i) / (image_width-1);
-            // Make g go from 1.0 to 0.0
-            auto g = double(j) / (image_height-1);
-            auto b = 0.25;
+            // Create pixel color with 3 values
+            // first one representing r, 2nd one g, 3rd one b
+            // r goes from 0.0 to 1.0 and g from 1.0 to 0.0
+            color pixel_color (
+                double(i) / (IMAGE_WIDTH-1),
+                double(j) / (IMAGE_HEIGHT-1),
+                0.25
+            );
 
             /**
              * This also means that r is 0 at the left side,
@@ -39,19 +45,8 @@ int main() {
              * at bottom left when r, g is 0 and blue still has some value
              **/
 
-            /**
-             * As we said colour values go from 0.0 to 1.0 so we somehow 
-             * need to make them go from 0 to 255 integer values because
-             * thats what ppm file format supports
-             **/
-            int ir = static_cast<int>(255.999 * r);
-            int ig = static_cast<int>(255.999 * g);
-            int ib = static_cast<int>(255.999 * b);
-
-            // Print the pixel values like 255 0 255
-            std::cout << ir << ' '
-                << ig << ' '
-                << ib << '\n';
+            // output the color
+            write_color(std::cout, pixel_color);
         }
     }
 

@@ -7,4 +7,10 @@ endif()
 
 project(RayTracingInWeekend)
 
-add_executable(main main.cpp)
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.h src/*cpp)
+add_executable(main ${SOURCE_FILES})
+
+target_include_directories(main
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
