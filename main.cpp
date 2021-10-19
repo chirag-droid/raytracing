@@ -13,6 +13,17 @@ int main() {
     
     // Iterate over height and width
     for (int j = image_height-1; j >= 0; j--) {
+        /**
+         * We are outputting it as error because error output does not
+         * get redirected to the file by default we use std::flush,
+         * because otherwise this whole thing can get printed after
+         * the program finishes, which is kinda useless
+         * 
+         * r character escape is for carriage return, which just
+         * positions the cursor to the beginning
+         **/
+        std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+
         for (int i = 0; i < image_width; i++) {
             // Colors are usually represented by color values from 0.0 to 1.0
     
@@ -43,4 +54,7 @@ int main() {
                 << ib << '\n';
         }
     }
+
+    // Print the done message
+    std::cerr << '\n' << "Done" << '\n';
 }
