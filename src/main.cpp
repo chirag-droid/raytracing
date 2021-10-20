@@ -33,7 +33,7 @@ int main() {
             // Create pixel color with 3 values
             // first one representing r, 2nd one g, 3rd one b
             // r goes from 0.0 to 1.0 and g from 1.0 to 0.0
-            color pixel_color (
+            Color pixel_color (
                 double(i) / (IMAGE_WIDTH-1),
                 double(j) / (IMAGE_HEIGHT-1),
                 0.25
