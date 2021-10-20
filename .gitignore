@@ -3,3 +3,6 @@ build/
 # Cmake Build files
 CMakeFiles/
 CMakeCache.txt
+
+# Build image files
+*.ppm
