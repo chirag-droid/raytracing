@@ -4,6 +4,9 @@ build/
 CMakeFiles/
 CMakeCache.txt
 
-# Build image files
+# Ppm image files except for image.ppm
 *.ppm
 !image.ppm
+
+# Vscode specific settings
+.vscode
