@@ -132,20 +132,19 @@ Color ray_color(const Ray& r) {
     // y for unit vector at center will be 0
     // y for unit vector at bottom will be less than 0
 
-    // So blue color at the top will be more
-    // and at the bottom will be less
-    // We will see a dark color at bottom
-    // and the top we will see more blue
-
-    // We should see a gradient where at the top is blue, and
-    // at the bottom is darker color
+    // t goes from 1 to 0 vertical direction
     // try changing unit_direction[1] to [0] what do you see?
+    auto t = 0.5 * (unit_direction[1] + 1);
 
-    // In the book there is different function for color
-    // but i went will a simpler one. In the next commit I will
-    // apply that
+    // Start of the gradiend (Blue)
+    Color startColor = Color(0, 0, 1);
+    // End of the gradient (Red)
+    Color endColor = Color(1, 0, 0);
 
-    auto blue = 0.5 * (unit_direction[1] + 1);
+    // We should see a gradient where at the top is red, and
+    // at the bottom is blue
 
-    return Color(0, 0, blue);
+    // For t=1 it will return endColor and for t=0 it will return startColor
+    // This is also known as a linear blend
+    return startColor + t * (endColor - startColor);
 }
