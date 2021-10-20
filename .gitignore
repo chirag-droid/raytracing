@@ -6,3 +6,4 @@ CMakeCache.txt
 
 # Build image files
 *.ppm
+!image.ppm
