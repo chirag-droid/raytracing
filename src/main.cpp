@@ -4,6 +4,8 @@
 #include "vec3.h"
 #include "ray.h"
 #include "color.h"
+#include "hittable.h"
+#include "sphere.h"
 
 double hit_sphere(const Point3& center, double radius, const Ray& r);
 Color ray_color(const Ray& r);
@@ -162,21 +164,17 @@ double hit_sphere(const Point3& center, double radius, const Ray& r) {
 }
 
 Color ray_color(const Ray& r) {
-    // Center of the sphere
-    Point3 center(0, 0, -1);
+    // Create a record of the hits
+    hit_record rec;
 
-    // Find at what point the ray hit the sphere
-    auto t = hit_sphere(center, 0.5, r);
-    if (t >= 0.0) {
-        // Find the normal vector
-        // r.at(t) is the point at which the ray hit the sphere
-        // The point on the sphere - center gives us the normal vector
+    // Create the sphere object
+    Sphere sphere(Point3(0, 0, -1), 0.5);
 
-        Vec3 normal = unit_vector(r.at(t) - center);
-
-        // normal has value ranging from -1 to 1 so we add 1 to it
-        // and divide by 2 to make it in range 0 to 1
-        return 0.5*Color(normal[0]+1, normal[1]+1, normal[2]+1);
+    // Check if the rays hit the sphere
+    if (sphere.hit(r, 0.0, 1, rec)) {
+        // If the rays hit, get the normal at the hit point and
+        // return the corresponding colours
+        return 0.5 * Color(rec.normal[0]+1, rec.normal[1]+1, rec.normal[2]+1);
     }
 
     // Get the unit vector from the ray
@@ -192,7 +190,7 @@ Color ray_color(const Ray& r) {
 
     // t goes from 0 to 1 vertical direction
     // try changing unit_direction[1] to [0] what do you see?
-    t = 1 - (0.5 * (unit_direction[1] + 1));
+    auto t = 1 - (0.5 * (unit_direction[1] + 1));
 
     // Start of the gradiend (Sky blue)
     Color startColor(0.5, 0.7, 1.0);
