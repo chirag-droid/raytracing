@@ -4,6 +4,7 @@
 #include "ray.h"
 #include "color.h"
 
+bool hit_sphere(const Point3& center, double radius, const Ray& r);
 Color ray_color(const Ray& r);
 
 int main() {
@@ -63,7 +64,7 @@ int main() {
      **/
 
     // Set focal length
-    auto focal_length = 2;
+    auto focal_length = 1;
     auto lower_left_corner = (origin - horizontal/2 - vertical/2) - Vec3(0, 0, focal_length);
 
     // PPM image headers
@@ -120,7 +121,49 @@ int main() {
     std::cerr << '\n' << "Done" << '\n';
 }
 
+bool hit_sphere(const Point3& center, double radius, const Ray& r) {
+    /**
+     * Any point on the sphere should satisfy the following mathematical property
+     * (x - Cx)^2 + (y - Cy)^2 + (z - Cz)^2= r^2 or,
+     * (Vec(x, y, z) - Vec(Cx, Cy, Cz)) . (Vec(x, y, z) - Vec(Cx, Cy, Cz)) or
+     * (P - C) . (P - C) = r^2
+     * 
+     * Any point P that satisfy this equation is on the sphere.
+     * And point P is the point on the ray
+     * ray.at(t) = P
+     * ray_origin + t * direction = P
+     * 
+     * (A + t * b - C) . (A + t * b - C) = r^2
+     * Let's apply the vector algebra
+     * (A-C).(A-C) + (A-c).t*b + (t*b).(A-C) + (t*b).(t*b) = r^2
+     * (A-C).(A-C) + 2tb.(A-C) + t^2 (b . b) = r^2
+     * t^2(b.b) + 2tb.(A-C) + (A-C).(A-C) - r^2 = 0
+     * 
+     * We already know all other values, we need to solve for t
+     * Notice: The equation is quadratic in t
+     * If the discriminant is > 0 means the roots are real
+     **/
+
+    // oc is our A-C term
+    Vec3 oc = r.origin() - center;
+
+    auto a = dot(r.direction(), r.direction());
+    auto b = 2.0 * dot(oc, r.direction());
+    auto c = dot(oc, oc) - radius * radius;
+
+    // Find the discriminant of the equation
+    auto discriminant = b*b - 4*a*c;
+
+    // return true if discriminant is greater than 0
+    return (discriminant > 0);
+}
+
 Color ray_color(const Ray& r) {
+    // If the ray hits the sphere return red color
+
+    if (hit_sphere(Point3(0, 0, -1), 0.5, r))
+        return Color(1, 0, 0);
+
     // Get the unit vector from the ray
     // Think of a unit vector as a vector which gets
     // us the direction of the vector by dividing by the length
@@ -132,17 +175,17 @@ Color ray_color(const Ray& r) {
     // y for unit vector at center will be 0
     // y for unit vector at bottom will be less than 0
 
-    // t goes from 1 to 0 vertical direction
+    // t goes from 0 to 1 vertical direction
     // try changing unit_direction[1] to [0] what do you see?
-    auto t = 0.5 * (unit_direction[1] + 1);
+    auto t = 1 - (0.5 * (unit_direction[1] + 1));
 
-    // Start of the gradiend (Blue)
-    Color startColor = Color(0, 0, 1);
-    // End of the gradient (Red)
-    Color endColor = Color(1, 0, 0);
+    // Start of the gradiend (Sky blue kind of color)
+    Color startColor = Color(0.5, 0.7, 1.0);
+    // End of the gradient (White)
+    Color endColor = Color(1, 1, 1);
 
-    // We should see a gradient where at the top is red, and
-    // at the bottom is blue
+    // We should see a gradient where at the top is sky blue, and
+    // at the bottom is white
 
     // For t=1 it will return endColor and for t=0 it will return startColor
     // This is also known as a linear blend
