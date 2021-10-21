@@ -1,10 +1,11 @@
 #include <iostream>
+#include <cmath>
 
 #include "vec3.h"
 #include "ray.h"
 #include "color.h"
 
-bool hit_sphere(const Point3& center, double radius, const Ray& r);
+double hit_sphere(const Point3& center, double radius, const Ray& r);
 Color ray_color(const Ray& r);
 
 int main() {
@@ -121,7 +122,7 @@ int main() {
     std::cerr << '\n' << "Done" << '\n';
 }
 
-bool hit_sphere(const Point3& center, double radius, const Ray& r) {
+double hit_sphere(const Point3& center, double radius, const Ray& r) {
     /**
      * Any point on the sphere should satisfy the following mathematical property
      * (x - Cx)^2 + (y - Cy)^2 + (z - Cz)^2= r^2 or,
@@ -154,15 +155,29 @@ bool hit_sphere(const Point3& center, double radius, const Ray& r) {
     // Find the discriminant of the equation
     auto discriminant = b*b - 4*a*c;
 
-    // return true if discriminant is greater than 0
-    return (discriminant > 0);
+    // If the discriminant is less than 0, then roots are unreal and return -1
+    if (discriminant < 0)
+        return -1;
+    return (-b - sqrt(discriminant)) / (2.0 * a);
 }
 
 Color ray_color(const Ray& r) {
-    // If the ray hits the sphere return red color
+    // Center of the sphere
+    Point3 center(0, 0, -1);
 
-    if (hit_sphere(Point3(0, 0, -1), 0.5, r))
-        return Color(1, 0, 0);
+    // Find at what point the ray hit the sphere
+    auto t = hit_sphere(center, 0.5, r);
+    if (t >= 0.0) {
+        // Find the normal vector
+        // r.at(t) is the point at which the ray hit the sphere
+        // The point on the sphere - center gives us the normal vector
+
+        Vec3 normal = unit_vector(r.at(t) - center);
+
+        // normal has value ranging from -1 to 1 so we add 1 to it
+        // and divide by 2 to make it in range 0 to 1
+        return 0.5*Color(normal[0]+1, normal[1]+1, normal[2]+1);
+    }
 
     // Get the unit vector from the ray
     // Think of a unit vector as a vector which gets
@@ -177,12 +192,12 @@ Color ray_color(const Ray& r) {
 
     // t goes from 0 to 1 vertical direction
     // try changing unit_direction[1] to [0] what do you see?
-    auto t = 1 - (0.5 * (unit_direction[1] + 1));
+    t = 1 - (0.5 * (unit_direction[1] + 1));
 
-    // Start of the gradiend (Sky blue kind of color)
-    Color startColor = Color(0.5, 0.7, 1.0);
+    // Start of the gradiend (Sky blue)
+    Color startColor(0.5, 0.7, 1.0);
     // End of the gradient (White)
-    Color endColor = Color(1, 1, 1);
+    Color endColor(1, 1, 1);
 
     // We should see a gradient where at the top is sky blue, and
     // at the bottom is white
