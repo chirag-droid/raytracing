@@ -1,8 +1,7 @@
 #include <iostream>
-#include <cmath>
 
-#include "vec3.h"
-#include "ray.h"
+#include "utility.h"
+
 #include "color.h"
 #include "hittable.h"
 #include "sphere.h"
