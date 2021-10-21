@@ -148,17 +148,17 @@ double hit_sphere(const Point3& center, double radius, const Ray& r) {
     // oc is our A-C term
     Vec3 oc = r.origin() - center;
 
-    auto a = dot(r.direction(), r.direction());
-    auto b = 2.0 * dot(oc, r.direction());
-    auto c = dot(oc, oc) - radius * radius;
+    auto a = r.direction().lengthSquared(); // a.a = a.length_squared()
+    auto half_b = dot(oc, r.direction());
+    auto c = oc.lengthSquared() - radius * radius;
 
     // Find the discriminant of the equation
-    auto discriminant = b*b - 4*a*c;
+    auto discriminant = half_b*half_b - a*c;
 
     // If the discriminant is less than 0, then roots are unreal and return -1
     if (discriminant < 0)
         return -1;
-    return (-b - sqrt(discriminant)) / (2.0 * a);
+    return (-half_b - sqrt(discriminant)) / a;
 }
 
 Color ray_color(const Ray& r) {
