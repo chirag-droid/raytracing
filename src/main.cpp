@@ -15,6 +15,20 @@ int main() {
     const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / aspect_ratio);
 
+    // Number of samples to take for each pixel
+    // When rendering a pixel, samples around the pixel will be taken
+    // and then averaged to create a antialiased pixel
+    const int SAMPLES_PER_PIXEL = static_cast<int>(
+        clamp(9000000 / (IMAGE_WIDTH * IMAGE_HEIGHT), 1, 100)
+    );
+
+    // A high sample per pixel will slow down rendering. For smaller resolutions
+    // more samples per pixel are needed and for high resolutions relatively
+    // less samples per pixel are needed
+
+    // So i just use a formula to determine the samples per pixel
+    // I don't think its very good but works fine
+
     // PPM image headers
     std::cout << "P3" << '\n'
         << IMAGE_WIDTH << ' ' << IMAGE_HEIGHT << '\n'
@@ -44,24 +58,31 @@ int main() {
         for (int i = 0; i < IMAGE_WIDTH; i++) {
             // Now we are iterating over every point on the scene
 
-            // u specifies the horizontal distance, and goes from 0.0 to 1.0
-            auto u = double(i) / (IMAGE_WIDTH-1);
-            // v specifies the vertical distance, and goes from 1.0 to 0.0
-            auto v = double(j) / (IMAGE_HEIGHT-1);
+            // Create a color
+            Color pixel_color(0, 0, 0);
 
-            // Get the ray from the camera
-            Ray r = camera.get_ray(u, v);
+            // Take SAMPLES_PER_PIXEL samples for each pixel
+            for (int s = 0; s < SAMPLES_PER_PIXEL; s++) {
+                // u specifies the horizontal distance, and goes from 0.0 to 1.0
+                auto u = double(i + random_double()) / (IMAGE_WIDTH-1);
+                // v specifies the vertical distance, and goes from 1.0 to 0.0
+                auto v = double(j + random_double()) / (IMAGE_HEIGHT-1);
 
-            // Get the corresponding pixel color for the ray and the world
-            Color pixel_color = ray_color(r, world);
+                // Get the ray from the camera
+                Ray r = camera.get_ray(u, v);
+
+                // Get the corresponding pixel color for the ray and the world
+                pixel_color += ray_color(r, world);
+            }
 
             // Output the color
-            write_color(std::cout, pixel_color);
+            write_color(std::cout, pixel_color / SAMPLES_PER_PIXEL);
         }
     }
 
     // Print the done message
     std::cerr << '\n' << "Done" << '\n';
+    std::cerr << SAMPLES_PER_PIXEL;
 }
 
 Color ray_color(const Ray& r, const Hittable& world) {
