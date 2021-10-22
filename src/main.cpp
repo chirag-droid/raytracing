@@ -3,11 +3,10 @@
 #include "utility.h"
 
 #include "color.h"
-#include "hittable.h"
+#include "hittable_list.h"
 #include "sphere.h"
 
-double hit_sphere(const Point3& center, double radius, const Ray& r);
-Color ray_color(const Ray& r);
+Color ray_color(const Ray& r, const Hittable& world);
 
 int main() {
     // Image dimensions
@@ -74,6 +73,11 @@ int main() {
         << IMAGE_WIDTH << ' ' << IMAGE_HEIGHT << '\n'
         << 255 << '\n';
     
+    // Create a hittable_list world with two sphere
+    HittableList world;
+    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
+    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+
     // Iterate over height and width
     for (int j = IMAGE_HEIGHT-1; j >= 0; j--) {
         /**
@@ -90,7 +94,7 @@ int main() {
         for (int i = 0; i < IMAGE_WIDTH; i++) {
             // Now we are iterating over every point on the scene
 
-            // U specifies the horizontal distance, and goes from 0.0 to 1.0
+            // u specifies the horizontal distance, and goes from 0.0 to 1.0
             auto u = double(i) / (IMAGE_WIDTH-1);
             // v specifies the vertical distance, and goes from 1.0 to 0.0
             auto v = double(j) / (IMAGE_HEIGHT-1);
@@ -101,18 +105,11 @@ int main() {
             // Also we can't just simply add v, u values, we will have to scale them
             // to use the fit view so we multiply by horizontal and vertical vectors
 
-            /**
-             * Try changing the focal length to 0 so that you can clearly see the dot
-             * from where the rays are coming from
-             * Now try changing the horizontal and vertical values
-             * You will see the origin is not at center anymore bcs it is not
-             * correctly fitting the view port
-             **/
-
             // Create the ray
             Ray r(origin, lower_left_corner + horizontal * u + vertical * v - origin);
-            // Get the corresponding pixel color for the ray
-            Color pixel_color = ray_color(r);
+
+            // Get the corresponding pixel color for the ray and the world
+            Color pixel_color = ray_color(r, world);
 
             // Output the color
             write_color(std::cout, pixel_color);
@@ -123,57 +120,15 @@ int main() {
     std::cerr << '\n' << "Done" << '\n';
 }
 
-double hit_sphere(const Point3& center, double radius, const Ray& r) {
-    /**
-     * Any point on the sphere should satisfy the following mathematical property
-     * (x - Cx)^2 + (y - Cy)^2 + (z - Cz)^2= r^2 or,
-     * (Vec(x, y, z) - Vec(Cx, Cy, Cz)) . (Vec(x, y, z) - Vec(Cx, Cy, Cz)) or
-     * (P - C) . (P - C) = r^2
-     * 
-     * Any point P that satisfy this equation is on the sphere.
-     * And point P is the point on the ray
-     * ray.at(t) = P
-     * ray_origin + t * direction = P
-     * 
-     * (A + t * b - C) . (A + t * b - C) = r^2
-     * Let's apply the vector algebra
-     * (A-C).(A-C) + (A-c).t*b + (t*b).(A-C) + (t*b).(t*b) = r^2
-     * (A-C).(A-C) + 2tb.(A-C) + t^2 (b . b) = r^2
-     * t^2(b.b) + 2tb.(A-C) + (A-C).(A-C) - r^2 = 0
-     * 
-     * We already know all other values, we need to solve for t
-     * Notice: The equation is quadratic in t
-     * If the discriminant is > 0 means the roots are real
-     **/
-
-    // oc is our A-C term
-    Vec3 oc = r.origin() - center;
-
-    auto a = r.direction().lengthSquared(); // a.a = a.length_squared()
-    auto half_b = dot(oc, r.direction());
-    auto c = oc.lengthSquared() - radius * radius;
-
-    // Find the discriminant of the equation
-    auto discriminant = half_b*half_b - a*c;
-
-    // If the discriminant is less than 0, then roots are unreal and return -1
-    if (discriminant < 0)
-        return -1;
-    return (-half_b - sqrt(discriminant)) / a;
-}
-
-Color ray_color(const Ray& r) {
+Color ray_color(const Ray& r, const Hittable& world) {
     // Create a record of the hits
     hit_record rec;
 
-    // Create the sphere object
-    Sphere sphere(Point3(0, 0, -1), 0.5);
-
-    // Check if the rays hit the sphere
-    if (sphere.hit(r, 0.0, 1, rec)) {
+    // Check if the rays hit the world
+    if (world.hit(r, 0.0, INF, rec)) {
         // If the rays hit, get the normal at the hit point and
         // return the corresponding colours
-        return 0.5 * Color(rec.normal[0]+1, rec.normal[1]+1, rec.normal[2]+1);
+        return 0.5 * Color(rec.normal + Color(1, 1, 1));
     }
 
     // Get the unit vector from the ray
