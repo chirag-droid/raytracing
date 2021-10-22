@@ -82,7 +82,6 @@ int main() {
 
     // Print the done message
     std::cerr << '\n' << "Done" << '\n';
-    std::cerr << SAMPLES_PER_PIXEL;
 }
 
 Color ray_color(const Ray& r, const Hittable& world) {
