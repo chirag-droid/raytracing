@@ -8,7 +8,7 @@ void write_color(std::ostream &out, Color pixel_color) {
     // need to make them go from 0 to 255 integer values because
     // thats what ppm file format supports
     pixel_color *= 255.999;
-    out << pixel_color[0] << ' '
-        << pixel_color[1] << ' '
-        << pixel_color[2] << '\n';
+    out << static_cast<int>(pixel_color[0]) << ' '
+        << static_cast<int>(pixel_color[1]) << ' '
+        << static_cast<int>(pixel_color[2]) << '\n';
 }
