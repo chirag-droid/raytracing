@@ -150,7 +150,7 @@ inline Vec3 unit_vector(Vec3 v) {
 }
 
 // Generate a random point within a sphere of 1 unit
-Vec3 random_in_unit_sphere() {
+inline Vec3 random_in_unit_sphere() {
     while (true) {
         // Generate a random point between -1 and 1
         // As random is static we use ::
@@ -164,6 +164,10 @@ Vec3 random_in_unit_sphere() {
         if (p.lengthSquared() >= 1) continue;
         return p;
     }
+}
+
+Vec3 random_unit_vector() {
+    return unit_vector(random_in_unit_sphere());
 }
 
 // Type aliases for Vec3
