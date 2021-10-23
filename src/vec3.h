@@ -166,8 +166,15 @@ inline Vec3 random_in_unit_sphere() {
     }
 }
 
-Vec3 random_unit_vector() {
+inline Vec3 random_unit_vector() {
     return unit_vector(random_in_unit_sphere());
+}
+
+Vec3 random_in_hemisphere(const Vec3& center) {
+    Vec3 in_unit_sphere = random_unit_vector();
+    if (dot(in_unit_sphere, center) > 0.0)
+        return in_unit_sphere;
+    return -in_unit_sphere;
 }
 
 // Type aliases for Vec3

@@ -102,11 +102,10 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
         // If the rays hit, get the point within the
         // 1 unit sphere that is tangent to it
 
-        // rec.p + rec.normal is the center of the one unit sphere
-        // than is tangent to it
-        // random_int_unit_sphere() generates a random unit vector within a 1 unit
-        // sphere we add it the center of it.
-        Point3 target = rec.p + rec.normal + random_unit_vector();
+        // rec.p is the hitpoint
+        // and random_in_hemisphere generates a random ray in hemisphere
+        // with rec.normal as center
+        Point3 target = rec.p + random_in_hemisphere(rec.normal);
 
         // Create a ray between the hit point and the target
         // multiply by 0.5 bcs we want to reflect only 50% light
