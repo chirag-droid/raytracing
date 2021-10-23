@@ -10,10 +10,6 @@ using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
 
-// Common header files
-#include "ray.h"
-#include "vec3.h"
-
 // Constants
 const double INF = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
@@ -43,3 +39,9 @@ inline double random_double(double min, double max) {
     // we can use that to generate random between [min, max)
     return min + (max - min) * random_double();
 }
+
+// Common header files
+// Include at last bcs these included files may include the functions return above
+// Common header files
+#include "ray.h"
+#include "vec3.h"

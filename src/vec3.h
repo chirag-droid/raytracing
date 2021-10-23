@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <cmath>
+
+#include "utility.h"
 
 class Vec3 {
 public:
@@ -73,6 +74,19 @@ public:
     double lengthSquared() const {
         return vec3[0]*vec3[0] + vec3[1]*vec3[1] + vec3[2]*vec3[2];
     }
+
+    // Some utility functions to generate random vectors
+    inline static Vec3 random() {
+        return Vec3(random_double(), random_double(), random_double());
+    }
+
+    inline static Vec3 random(double min, double max) {
+        return Vec3(
+            random_double(min, max),
+            random_double(min, max),
+            random_double(min, max)
+        );
+    }
 };
 
 // Utility functions
@@ -133,6 +147,23 @@ inline Vec3 cross(const Vec3 &p1, const Vec3 &p2) {
 
 inline Vec3 unit_vector(Vec3 v) {
     return v / v.length();
+}
+
+// Generate a random point within a sphere of 1 unit
+Vec3 random_in_unit_sphere() {
+    while (true) {
+        // Generate a random point between -1 and 1
+        // As random is static we use ::
+        auto p = Vec3::random(-1, 1);
+
+        // If the length from the origin to the point
+        // is less 1 return p else continue
+
+        // We should ideally use length function but we dont need to here
+        // length function takes sqrt of the length squared
+        if (p.lengthSquared() >= 1) continue;
+        return p;
+    }
 }
 
 // Type aliases for Vec3

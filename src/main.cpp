@@ -7,7 +7,7 @@
 #include "hittable_list.h"
 #include "sphere.h"
 
-Color ray_color(const Ray& r, const Hittable& world);
+Color ray_color(const Ray& r, const Hittable& , int max_depth);
 
 int main() {
     // Image dimensions
@@ -28,6 +28,9 @@ int main() {
 
     // So i just use a formula to determine the samples per pixel
     // I don't think its very good but works fine
+
+    // Max depth is the ray bounce limit
+    const int MAX_DEPTH = 50;
 
     // PPM image headers
     std::cout << "P3" << '\n'
@@ -72,11 +75,11 @@ int main() {
                 Ray r = camera.get_ray(u, v);
 
                 // Get the corresponding pixel color for the ray and the world
-                pixel_color += ray_color(r, world);
+                pixel_color += ray_color(r, world, MAX_DEPTH);
             }
 
             // Output the color
-            write_color(std::cout, pixel_color / SAMPLES_PER_PIXEL);
+            write_color(std::cout, pixel_color, SAMPLES_PER_PIXEL);
         }
     }
 
@@ -84,15 +87,29 @@ int main() {
     std::cerr << '\n' << "Done" << '\n';
 }
 
-Color ray_color(const Ray& r, const Hittable& world) {
+Color ray_color(const Ray& r, const Hittable& world, int depth) {
     // Create a record of the hits
     hit_record rec;
 
+    // If we reach the max depth limit return black
+    if (depth <= 0)
+        return Color(0, 0, 0);
+
     // Check if the rays hit the world
-    if (world.hit(r, 0.0, INF, rec)) {
-        // If the rays hit, get the normal at the hit point and
-        // return the corresponding colours
-        return 0.5 * Color(rec.normal + Color(1, 1, 1));
+    if (world.hit(r, 0.001, INF, rec)) {
+        // If the rays hit, get the point within the
+        // 1 unit sphere that is tangent to it
+
+        // rec.p + rec.normal is the center of the one unit sphere
+        // than is tangent to it
+        // random_int_unit_sphere() generates a random point within a 1 unit
+        // sphere we add it the center of it.
+        Point3 target = rec.p + rec.normal + random_in_unit_sphere();
+
+        // Create a ray between the hit point and the target
+        // multiply by 0.5 bcs we want to reflect only 50% light
+        // multipling by 1 will reflect 100% light
+        return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth-1);
     }
 
     // Get the unit vector from the ray
