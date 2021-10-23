@@ -6,9 +6,11 @@
 void write_color(std::ostream &out, Color pixel_color, int samples_per_pixel) {
     // Divide the color by the number of samples
     auto scale = 1.0 / samples_per_pixel;
-    auto r = scale * pixel_color[0];
-    auto g = scale * pixel_color[1];
-    auto b = scale * pixel_color[2];
+
+    // gamma correct for gamma = 2.0
+    auto r = sqrt(scale * pixel_color[0]);
+    auto g = sqrt(scale * pixel_color[1]);
+    auto b = sqrt(scale * pixel_color[2]);
 
     // Write the translated [0,255] value of each color component.
     // as colour values range from 0 to 1 we clamp them to 0 to 0.999

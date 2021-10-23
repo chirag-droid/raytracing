@@ -96,6 +96,8 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
         return Color(0, 0, 0);
 
     // Check if the rays hit the world
+    // we dont care about the rays at less than (t=0.001) because these rays
+    // are reflecting the object they are reflecting
     if (world.hit(r, 0.001, INF, rec)) {
         // If the rays hit, get the point within the
         // 1 unit sphere that is tangent to it
