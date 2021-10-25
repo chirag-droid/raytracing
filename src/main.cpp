@@ -1,12 +1,9 @@
-#include <iostream>
-
 #include "utility.h"
-
 #include "camera.h"
 #include "color.h"
 #include "hittable_list.h"
 #include "sphere.h"
-#include "lambertian.h"
+#include "material.h"
 
 Color ray_color(const Ray& r, const Hittable& , int max_depth);
 
@@ -43,10 +40,12 @@ int main() {
 
     // Create a hittable_list world with two sphere
     HittableList world;
-    // create the material to use for the world
-    auto mat = make_shared<Lambertian>();
-    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, mat));
-    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, mat));
+    // create the material for the world
+    auto mat_ground = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
+    auto mat_sphere = make_shared<Lambertian>(Color(0.7, 0.3, 0.3));
+
+    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, mat_sphere));
+    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, mat_ground));
 
     // Iterate over height and width
     for (int j = IMAGE_HEIGHT-1; j >= 0; j--) {
@@ -102,15 +101,16 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
     // we dont care about the rays at less than (t=0.001) because these rays
     // are reflecting the object they are reflecting
     if (world.hit(r, 0.001, INF, rec)) {
+        Color attenuation;
         // The ray generated after hitting the world
         Ray scattered;
 
         // If the ray hits succesfully, scatter it using the material abstraction
-        if (rec.mat_ptr->scatter(r, rec, scattered))
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
             // multiply by 0.5 bcs we want to reflect only 50% light
             // multipling by 1 will reflect 100% light
             // Return the color of the scattered ray
-            return 0.5 * ray_color(scattered, world, depth-1);
+            return attenuation * ray_color(scattered, world, depth-1);
     }
 
     // Get the unit vector from the ray
