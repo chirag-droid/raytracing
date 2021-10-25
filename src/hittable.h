@@ -1,10 +1,16 @@
 #pragma once
 
-#include "ray.h"
+#include "utility.h"
+
+class Material;
 
 struct hit_record {
     Point3 p;
     Vec3 normal;
+
+    // mat_ptr keeps track of the material used with the hit_record
+    shared_ptr<Material> mat_ptr;
+
     double t;
     // We somehow need to keep track of whether the ray
     // intersected on the front face or from the inside

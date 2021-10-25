@@ -6,6 +6,7 @@
 #include "color.h"
 #include "hittable_list.h"
 #include "sphere.h"
+#include "lambertian.h"
 
 Color ray_color(const Ray& r, const Hittable& , int max_depth);
 
@@ -42,8 +43,10 @@ int main() {
 
     // Create a hittable_list world with two sphere
     HittableList world;
-    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
-    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+    // create the material to use for the world
+    auto mat = make_shared<Lambertian>();
+    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, mat));
+    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, mat));
 
     // Iterate over height and width
     for (int j = IMAGE_HEIGHT-1; j >= 0; j--) {
@@ -99,18 +102,15 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
     // we dont care about the rays at less than (t=0.001) because these rays
     // are reflecting the object they are reflecting
     if (world.hit(r, 0.001, INF, rec)) {
-        // If the rays hit, get the point within the
-        // 1 unit sphere that is tangent to it
+        // The ray generated after hitting the world
+        Ray scattered;
 
-        // rec.p is the hitpoint
-        // and random_in_hemisphere generates a random ray in hemisphere
-        // with rec.normal as center
-        Point3 target = rec.p + random_in_hemisphere(rec.normal);
-
-        // Create a ray between the hit point and the target
-        // multiply by 0.5 bcs we want to reflect only 50% light
-        // multipling by 1 will reflect 100% light
-        return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth-1);
+        // If the ray hits succesfully, scatter it using the material abstraction
+        if (rec.mat_ptr->scatter(r, rec, scattered))
+            // multiply by 0.5 bcs we want to reflect only 50% light
+            // multipling by 1 will reflect 100% light
+            // Return the color of the scattered ray
+            return 0.5 * ray_color(scattered, world, depth-1);
     }
 
     // Get the unit vector from the ray
