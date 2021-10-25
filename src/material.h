@@ -37,9 +37,10 @@ public:
 class Metal : public Material {
 public:
     Color albedo;
+    double fuzz;
 public:
     // Class constructors
-    Metal(const Color& a) : albedo(a) {}
+    Metal(const Color& a, double f) : albedo(a), fuzz(f < 1 ? f : 1) {}
 
     virtual bool scatter(
         const Ray& r_in, const hit_record& rec, Color& attenuation, Ray& scattered
@@ -48,7 +49,7 @@ public:
         Vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
 
         // scattered ray is the ray join the hit point to the reflected vector
-        scattered = Ray(rec.p, reflected);
+        scattered = Ray(rec.p, reflected + fuzz * random_in_unit_sphere());
         attenuation = albedo;
 
         // return true if the direction of scatter and normal is on same side
