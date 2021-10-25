@@ -177,6 +177,11 @@ Vec3 random_in_hemisphere(const Vec3& center) {
     return -in_unit_sphere;
 }
 
+// Reflects a vector along a particular normal
+Vec3 reflect(const Vec3& v, const Vec3& n) {
+    return v - 2*dot(v, n)*n;
+}
+
 // Type aliases for Vec3
 using Point3 = Vec3;   // 3D point
 using Color = Vec3;    // RGB color
