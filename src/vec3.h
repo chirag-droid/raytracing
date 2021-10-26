@@ -87,6 +87,12 @@ public:
             random_double(min, max)
         );
     }
+
+    bool near_zero() const {
+        // Return true if the vector is close to zero in all dimensions.
+        const auto s = 1e-8;
+        return (fabs(vec3[0]) < s) && (vec3[1] < s) && (fabs(vec3[2]) < s);
+    }
 };
 
 // Utility functions

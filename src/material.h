@@ -22,12 +22,14 @@ public:
     virtual bool scatter(
         const Ray& r_in, const hit_record& rec, Color& attenuation, Ray& scattered
     ) const override {
-        // Scatter the ray within 1 unit sphere that is tangent to the hitpoint
-        // rec.p is hitpoint
-        auto scatter_direction = rec.p + random_in_hemisphere(rec.normal);
+        auto scatter_direction = rec.normal + random_unit_vector();
+
+        // Catch degenerate scatter direction
+        if (scatter_direction.near_zero())
+            scatter_direction = rec.normal;
 
         // scattered ray is ray between hitpoint and the scatter direction
-        scattered = Ray(rec.p, scatter_direction - rec.p);
+        scattered = Ray(rec.p, scatter_direction);
         attenuation = albedo;
 
         return true;
