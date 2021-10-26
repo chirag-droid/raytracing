@@ -76,10 +76,30 @@ public:
         attenuation = Color(1.0, 1.0, 1.0);
         double refraction_ratio = rec.front_face ? (1.0/ir) : ir;
 
+        // change the input ray to unit vector bcs refract expects us to have unit vectors
         Vec3 unit_direction = unit_vector(r_in.direction());
-        Vec3 refracted = refract(unit_direction, rec.normal, refraction_ratio);
 
-        scattered = Ray(rec.p, refracted);
+        // dot product of two vector is the product of their length and cos of the angles
+        // as we are using unit vectors, finding the dot product gets us the cos of theta
+        double cos_theta = fmin(dot(-unit_direction, rec.normal), 1.0);
+        // This is basically derived from sin^2 + cos^2 = 1
+        double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
+
+        // If the product of refraction ration and sin theta is greater than 1
+        // thhen the ray can not refract bcs sin of an angle can not be greater than 1
+        bool cannot_refract = refraction_ratio * sin_theta > 1.0;
+
+        // direction is the direction of the scattered ray
+        Vec3 direction;
+
+        // If the ray can not refract, direction is reflected ray else refract
+        if (cannot_refract)
+            direction = reflect(unit_direction, rec.normal);
+        else
+            direction = refract(unit_direction, rec.normal, refraction_ratio);
+
+        // scattered is the ray between the hit point and the dirction of scattered ray
+        scattered = Ray(rec.p, direction);
         return true;
     }
 };
