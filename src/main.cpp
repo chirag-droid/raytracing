@@ -36,28 +36,24 @@ int main() {
         << 255 << '\n';
 
     // Camera
-    Camera camera(135, aspect_ratio);
+    Point3 lookfrom(13, 2, 3);
+    Point3 lookat(0, 0, 0);
+    Vec3 vup(0, 1, 0);
+    Camera camera(lookfrom, lookat, vup, 20, aspect_ratio);
 
     // Create a hittable_list world
     HittableList world;
-    // create the material for the world
-    auto material_ground = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
-    auto material_center = make_shared<Lambertian>(Color(0.7, 0.3, 0.3));
-    auto material_right   = make_shared<Metal>(Color(0.8, 0.8, 0.8), 0.3);
-    auto material_left  = make_shared<Dielectric>(1.3);
+    auto ground_material = make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+    world.add(make_shared<Sphere>(Point3(0,-1000,0), 1000, ground_material));
 
-    // The ground
-    world.add(make_shared<Sphere>(Point3( 0.0, -100.5, -1.0), 100.0, material_ground));
+    auto metal = make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.3);
+    world.add(make_shared<Sphere>(Point3(4, 1, 0), 1.0, metal));
 
-    // The center blue coloured sphere
-    world.add(make_shared<Sphere>(Point3( 0.0,    0.0, -1.0),   0.5, material_center));
+    auto dielectric = make_shared<Dielectric>(1.5);
+    world.add(make_shared<Sphere>(Point3(0, 1, 0), 1.0, dielectric));
 
-    // The left glass hollow sphere
-    world.add(make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),   0.5, material_left));
-    world.add(make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),  -0.4, material_left));
-
-    // the right metal sphere
-    world.add(make_shared<Sphere>(Point3( 1.0,    0.0, -1.0),   0.5, material_right));
+    auto lambertian = make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
+    world.add(make_shared<Sphere>(Point3(-4, 1, 0), 1.0, lambertian));
 
     // Iterate over height and width
     for (int j = IMAGE_HEIGHT-1; j >= 0; j--) {

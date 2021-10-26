@@ -11,8 +11,11 @@ private:
     Vec3 vertical;
 public:
     Camera(
-      double vfov,
-      double aspect_ratio
+      Point3 lookfrom, // the point to look from
+      Point3 lookat, // the point to look to
+      Vec3 vup, // the rotation around the lookat-lookfrom axis
+      double vfov, // vertical field of view in degrees
+      double aspect_ratio // the aspect ration for the camera
     ) {
         // The view port dimensions
         auto theta = degrees_to_radians(vfov);
@@ -20,50 +23,39 @@ public:
         auto viewport_height = 2.0 * h;
         auto viewport_width = aspect_ratio * viewport_height;
 
-        /**
-          * So our task was to create a ray tracer. For that we need a
-          * origin point from where the rays fall into the scene.
-          * To create a ray tracer we will create rays from the origin and
-          **/
+        // A unit vector which specifies the direction of lookfrom with respect to lookat
+        auto w = unit_vector(lookfrom - lookat);
 
-        // Origin point x=0, y=0, z=0
-        origin = Point3(0, 0, 0);
+        // u, v are both unit vectors
+        // refer this diagram https://raytracing.github.io/images/fig-1.16-cam-view-up.jpg
+        // u will result in a vector that is perpendicular to both vup and w
+        auto u = unit_vector(cross(vup, w));
+        // v will result in a vector that is perpendicular to both w and u
+        auto v = cross(w, u);
 
-        // You can choose the origin anything you like
-        // 0, 0, 0 will place it at the center
+        // Origin point is same as the lookfrom point
+        origin = lookfrom;
 
         // horizontal and vertical vectors
-        horizontal = Vec3(viewport_width, 0, 0);
-        vertical = Vec3(0, viewport_height, 0);
-
-        // Set focal length
-        auto focal_length = 1.0;
+        horizontal = viewport_width * u;
+        vertical = viewport_height * v;
 
         /**
           * The lower left corner is the lower left corner of the scene.
-          * The lower left corner is calculated by adding 1/2 horizontal and subtracting
-          * 1/2 vertical. It could have been upper left corner or something but we are choosing
-          * lower left corner.
-          * Now why are we subtracting the focal length from the z value? It just places the scenes's
-          * lower left corner focal length away from the origin of the ray.
+          * by adding 1/2 horizontal and subtracting we can get the lower left corner. 
           * 
-          * Try changing the value of focal_length to very small, what happens? You should
-          * see a dot forming on the image from where the rays are emerging. Because the 
-          * origin is close to the scene
-          * 
-          * A large focal length just places the origin away from the scene.
-          * 
-          * Basically, focal length specifies the distance between the origin and the scene
+          * We subtract w so that it places the lower left corner at right distance
+          * as specified by the lookfrom and lookat
           **/
-        lower_left_corner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focal_length);
+        lower_left_corner = origin - horizontal/2 - vertical/2 - w;
     }
 
-    Ray get_ray(double u, double v) const {
+    Ray get_ray(double s, double t) const {
         // Remember we had a lower left corner on the view port. We can simply
-        // Add the u, v value to it, if we chose upper right corner we would have to
+        // Add the s, t value to it, if we chose upper right corner we would have to
         // subtract these values instead of adding that totally depends on you
-        // Also we can't just simply add v, u values, we will have to scale them
+        // Also we can't just simply add t, s values, we will have to scale them
         // to use the fit view so we multiply by horizontal and vertical vectors
-        return Ray(origin, lower_left_corner + u*horizontal + v*vertical - origin);
+        return Ray(origin, lower_left_corner + s*horizontal + t*vertical - origin);
     }
 };
