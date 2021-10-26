@@ -38,7 +38,7 @@ int main() {
     // Camera
     Camera camera;
 
-    // Create a hittable_list world with two sphere
+    // Create a hittable_list world
     HittableList world;
     // create the material for the world
     auto material_ground = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
@@ -46,9 +46,17 @@ int main() {
     auto material_right   = make_shared<Metal>(Color(0.8, 0.8, 0.8), 0.3);
     auto material_left  = make_shared<Dielectric>(1.3);
 
+    // The ground
     world.add(make_shared<Sphere>(Point3( 0.0, -100.5, -1.0), 100.0, material_ground));
+
+    // The center blue coloured sphere
     world.add(make_shared<Sphere>(Point3( 0.0,    0.0, -1.0),   0.5, material_center));
+
+    // The left glass hollow sphere
     world.add(make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),   0.5, material_left));
+    world.add(make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),  -0.4, material_left));
+
+    // the right metal sphere
     world.add(make_shared<Sphere>(Point3( 1.0,    0.0, -1.0),   0.5, material_right));
 
     // Iterate over height and width
