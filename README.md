@@ -11,9 +11,10 @@ The source code contains source code from the book, there can be some alteration
   ```
 - Then to compile
   ```
-  cmake -B build -G <build system>
+  cmake -B build -G <build system> -D CMAKE_BUILD_TYPE=Release
   ```
-  This will build the project for your build system in build directory
+  This will build the release project for your build system in build directory
+  you can build for debugging too, but release build is so much fast
 - Then to run
   ```
   cd build
