@@ -56,3 +56,30 @@ public:
         return (dot(scattered.direction(), rec.normal) > 0);
     }
 };
+
+/** 
+ * Clear materials such as water, glass, and diamonds are dielectrics.
+ * When a light ray hits them, it splits into a reflected ray and a refracted ray.
+ * We’ll handle that by randomly choosing between reflection or refraction,
+ * and only generating one scattered ray per interaction.
+ **/
+class Dielectric : public Material {
+public:
+    // ir specifies the index of refraction
+    double ir;
+public:
+    Dielectric(double index_of_refraction) : ir(index_of_refraction) {}
+
+    virtual bool scatter(
+        const Ray& r_in, const hit_record& rec, Color& attenuation, Ray& scattered
+    ) const override {
+        attenuation = Color(1.0, 1.0, 1.0);
+        double refraction_ratio = rec.front_face ? (1.0/ir) : ir;
+
+        Vec3 unit_direction = unit_vector(r_in.direction());
+        Vec3 refracted = refract(unit_direction, rec.normal, refraction_ratio);
+
+        scattered = Ray(rec.p, refracted);
+        return true;
+    }
+};

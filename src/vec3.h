@@ -182,6 +182,23 @@ Vec3 reflect(const Vec3& v, const Vec3& n) {
     return v - 2*dot(v, n)*n;
 }
 
+Vec3 refract(const Vec3& uv, const Vec3& normal, double refractive_index) {
+    // Find the cos theta, dot product of two vectors is
+    // product of their length and the cos theta as normal and uv are expected
+    // to be unit vector this will result in the cos of angle between them
+    auto cos_theta = fmin(dot(-uv, normal), 1.0);
+
+    // the following formulas correspond to
+    // https://raytracing.github.io/books/RayTracingInOneWeekend.html scroll to snells law
+    // trajectory vector perpendicular to the normal
+    Vec3 r_perp = refractive_index * (uv + cos_theta*normal);
+    // trajectory parallel parallel to the normal
+    Vec3 r_parallel = -sqrt(fabs(1.0 - r_perp.lengthSquared())) * normal;
+
+    // return the sum of the parallel and the perpendicular vector
+    return r_perp + r_parallel;
+}
+
 // Type aliases for Vec3
 using Point3 = Vec3;   // 3D point
 using Color = Vec3;    // RGB color
