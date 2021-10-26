@@ -63,13 +63,13 @@ int main() {
     // When rendering a pixel, samples around the pixel will be taken
     // and then averaged to create a antialiased pixel
     const int SAMPLES_PER_PIXEL = static_cast<int>(
-        clamp(9000000 / (IMAGE_WIDTH * IMAGE_HEIGHT), 1, 100)
+        clamp(90000000 / (IMAGE_WIDTH * IMAGE_HEIGHT), 1, 500)
     );
+    // 1440 width results in about 130 samples per pixel
 
     // A high sample per pixel will slow down rendering. For smaller resolutions
     // more samples per pixel are needed and for high resolutions relatively
-    // less samples per pixel are needed
-
+    // less samples per pixel are needed.
     // So i just use a formula to determine the samples per pixel
     // I don't think its very good but works fine
 
