@@ -36,7 +36,7 @@ int main() {
         << 255 << '\n';
 
     // Camera
-    Camera camera;
+    Camera camera(135, aspect_ratio);
 
     // Create a hittable_list world
     HittableList world;

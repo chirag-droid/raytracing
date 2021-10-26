@@ -10,20 +10,14 @@ private:
     Vec3 horizontal;
     Vec3 vertical;
 public:
-    Camera() {
-        /**
-          * The aspect ratio of the view port should be same as the image
-          * You can definetly render without a view port 
-          * but then you will have to adjust your focal length and
-          * all those variables again and again if you change the image
-          * width and height. Its always a better choice to choose a reference
-          * view. So you get the same render for every image width and height
-          * 
-          * The view port is like a virtual screen.
-          **/
+    Camera(
+      double vfov,
+      double aspect_ratio
+    ) {
         // The view port dimensions
-        auto aspect_ratio = 16.0 / 9.0;
-        auto viewport_height = 2.0;
+        auto theta = degrees_to_radians(vfov);
+        auto h = tan(theta/2);
+        auto viewport_height = 2.0 * h;
         auto viewport_width = aspect_ratio * viewport_height;
 
         /**
