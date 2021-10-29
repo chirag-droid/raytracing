@@ -1,3 +1,5 @@
+![final render](https://user-images.githubusercontent.com/81347541/139380284-77039f0f-70ab-4d3f-a127-bced36179716.png)
+
 ## Raytracing
 A personal repo to keep track of [Ray Tracing in One Weekend book](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
 
