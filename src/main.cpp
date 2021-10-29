@@ -29,7 +29,7 @@ HittableList random_scene() {
                     auto albedo = Color::random(0.5, 1);
                     auto fuzz = random_double(0, 0.5);
                     sphere_material = make_shared<Metal>(albedo, fuzz);
-                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                    world.  add(make_shared<Sphere>(center, 0.2, sphere_material));
                 } else {
                     // glass
                     sphere_material = make_shared<Dielectric>(1.5);
@@ -85,7 +85,10 @@ int main() {
     Point3 lookfrom(13, 2, 3);
     Point3 lookat(0, 0, 0);
     Vec3 vup(0, 1, 0);
-    Camera camera(lookfrom, lookat, vup, 20, aspect_ratio);
+    auto dist_to_focus = 10.0;
+    auto aperture = 0.1;
+
+    Camera camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
     // Create a hittable_list world
     auto world = random_scene();

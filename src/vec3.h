@@ -205,6 +205,14 @@ Vec3 refract(const Vec3& uv, const Vec3& normal, double refractive_index) {
     return r_perp + r_parallel;
 }
 
+Vec3 random_in_unit_disk() {
+    while (true) {
+        auto p = Vec3(random_double(-1,1), random_double(-1,1), 0);
+        if (p.lengthSquared() >= 1) continue;
+        return p;
+    }
+}
+
 // Type aliases for Vec3
 using Point3 = Vec3;   // 3D point
 using Color = Vec3;    // RGB color
